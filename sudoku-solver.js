@@ -5,12 +5,14 @@
   }
 
   function Matrix( x, y ) {
+    this.ARRAY = [1,2,3,4,5,6,7,8,9];
     this.x = x;
     this.y = y;
     this.init();
     this.prefill();
     this.draw();
     this.validate();
+    this.solve();
   }
   Matrix.prototype = {
     constructor: Matrix,
@@ -42,9 +44,14 @@
             $element.html("&nbsp;");
           } else {
             $element.html(this.grid[x][y]);
+            $element.addClass('default-value');
           }
         }
       }
+    },
+
+    drawBlock: function( x, y, num ) {
+      $('#block-' + x + '-' + y).text(num);
     },
 
     checkForDuplicates: function( list ) {
@@ -62,10 +69,8 @@
       console.log('validating ..');
       var x, y;
       var columns = [[],[],[],[],[],[],[],[],[]];
-      //var tempHorizontalItemsList;
-      //var tempVerticalItemsList;
+      // Checking horizontal lines
       for (x = 0; x < this.grid.length; x += 1) {
-        // Checking horizontal lines
         try {
           this.checkForDuplicates(this.grid[x]);
         } catch (e) {
@@ -86,8 +91,8 @@
         columns[8].push(this.grid[x][8]);
       }
 
+      // Checking vertical lines
       for (y = 0; y < columns.length; y += 1) {
-        // Checking vertical lines
         try {
           this.checkForDuplicates(columns[y]);
         } catch (e) {
@@ -97,8 +102,46 @@
         }
       }
 
-      console.log('Seems valid.');
+      console.log('.. seems valid');
       return true;
+    },
+
+    diff: function( arr1, arr2 ) {
+      return arr1.filter(function( arr1 ){
+        return arr2.indexOf(arr1) == -1;
+      })
+    },
+
+    checkHorizontalLines: function() {
+      var empty, index, number;
+      for (var i = 0; i < this.grid.length; i += 1) {
+        empty = this.grid[i].filter(function( item ) {
+          return item === null;
+        });
+        if (empty.length === 1) {
+          index = this.grid[i].indexOf(null);
+          number = this.diff(this.ARRAY, this.grid[i]);
+          this.grid[i][index] = number;
+          //console.log('MISSING NUMBER: ', number);
+          this.drawBlock(i, index, number);
+        }
+      }
+      return false;
+    },
+
+    checkVerticalLines: function() {
+      return false;
+    },
+
+    solve: function() {
+      console.log('solving ..');
+      var notStuck = true;
+      while (notStuck) {
+        notStuck = this.checkHorizontalLines();
+        if (notStuck) continue;
+        notStuck = this.checkVerticalLines();
+      }
+      console.log('stuck ..');
     },
 
     prefill: function() {
@@ -133,9 +176,20 @@
       this.grid[8][5] = 9;
       this.grid[8][8] = 7;
 
+
+
+
+      // .. Testing
+
       //this.grid[0][7] = 8; // REMOVE (just a test)
       //this.grid[3][5] = 5; // REMOVE (just a test)
       //this.grid[6][0] = 8; // REMOVE (just a test)
+
+      // Test if checkHorizontalLinesWork
+      //this.grid[1][0] = 1;
+      //this.grid[1][4] = 8;
+      //this.grid[7][0] = 4;
+      //this.grid[7][4] = 3;
     }
   };
 
