@@ -211,21 +211,26 @@
 
       // .. Testing
 
-      //this.grid[0][7] = 8; // REMOVE (just a test)
-      //this.grid[3][5] = 5; // REMOVE (just a test)
-      //this.grid[6][0] = 8; // REMOVE (just a test)
+      // Test if validation works
+      //this.grid[0][7] = 8;
+      //this.grid[3][5] = 5;
+      //this.grid[6][0] = 8;
 
-      // Test if checkHorizontalLinesWork
+      // Test if checkHorizontalLines works
       //this.grid[1][0] = 1;
       //this.grid[1][4] = 8;
       //this.grid[7][0] = 4;
       //this.grid[7][4] = 3;
 
-      // Test if checkVerticalLinesWork
-      this.grid[0][2] = 7;
-      this.grid[2][2] = 2;
-      this.grid[4][2] = 6;
-      this.grid[6][2] = 8;
+      // Test if checkVerticalLines works
+      //this.grid[0][2] = 7;
+      //this.grid[2][2] = 2;
+      //this.grid[4][2] = 6;
+      //this.grid[6][2] = 8;
+      //this.grid[2][5] = 1;
+      //this.grid[4][5] = 6;
+      //this.grid[5][5] = 5;
+      //this.grid[6][5] = 2;
     }
   };
 
