@@ -113,6 +113,7 @@
     },
 
     checkHorizontalLines: function() {
+      console.log('checking horizontal lines for one missing number ..');
       var empty, index, number;
       for (var i = 0; i < this.grid.length; i += 1) {
         empty = this.grid[i].filter(function( item ) {
@@ -122,26 +123,55 @@
           index = this.grid[i].indexOf(null);
           number = this.diff(this.ARRAY, this.grid[i]);
           this.grid[i][index] = number;
-          //console.log('MISSING NUMBER: ', number);
+          console.info('solved one number ..');
           this.drawBlock(i, index, number);
+          return true;
         }
       }
       return false;
     },
 
     checkVerticalLines: function() {
+      console.log('checking vertical lines for one missing number ..');
+      var x, columns = [[],[],[],[],[],[],[],[],[]];
+      for (x = 0; x < this.grid.length; x += 1) {
+        // Store columns data
+        columns[0].push(this.grid[x][0]);
+        columns[1].push(this.grid[x][1]);
+        columns[2].push(this.grid[x][2]);
+        columns[3].push(this.grid[x][3]);
+        columns[4].push(this.grid[x][4]);
+        columns[5].push(this.grid[x][5]);
+        columns[6].push(this.grid[x][6]);
+        columns[7].push(this.grid[x][7]);
+        columns[8].push(this.grid[x][8]);
+      }
+      var empty, index, number;
+      for (var i = 0; i < columns.length; i += 1) {
+        empty = columns[i].filter(function( item ) {
+          return item === null;
+        });
+        if (empty.length === 1) {
+          index = columns[i].indexOf(null);
+          number = this.diff(this.ARRAY, columns[i]);
+          this.grid[index][i] = number;
+          console.info('solved one number ..');
+          this.drawBlock(index, i, number);
+          return true;
+        }
+      }
       return false;
     },
 
     solve: function() {
-      console.log('solving ..');
+      console.log('solving ..\n');
       var notStuck = true;
       while (notStuck) {
         notStuck = this.checkHorizontalLines();
         if (notStuck) continue;
         notStuck = this.checkVerticalLines();
       }
-      console.log('stuck ..');
+      console.log('\nstuck ..');
     },
 
     prefill: function() {
@@ -190,6 +220,12 @@
       //this.grid[1][4] = 8;
       //this.grid[7][0] = 4;
       //this.grid[7][4] = 3;
+
+      // Test if checkVerticalLinesWork
+      this.grid[0][2] = 7;
+      this.grid[2][2] = 2;
+      this.grid[4][2] = 6;
+      this.grid[6][2] = 8;
     }
   };
 
