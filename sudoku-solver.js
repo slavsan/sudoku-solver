@@ -112,7 +112,7 @@
       })
     },
 
-    checkHorizontalLines: function() {
+    checkHorizontalLinesForOneMissingNumber: function() {
       console.log('checking horizontal lines for one missing number ..');
       var empty, index, number;
       for (var i = 0; i < this.grid.length; i += 1) {
@@ -122,16 +122,16 @@
         if (empty.length === 1) {
           index = this.grid[i].indexOf(null);
           number = this.diff(this.ARRAY, this.grid[i]);
-          this.grid[i][index] = number;
+          this.grid[i][index] = number[0];
           console.info('solved one number ..');
-          this.drawBlock(i, index, number);
+          this.drawBlock(i, index, number[0]);
           return true;
         }
       }
       return false;
     },
 
-    checkVerticalLines: function() {
+    checkVerticalLinesForOneMissingNumber: function() {
       console.log('checking vertical lines for one missing number ..');
       var x, columns = [[],[],[],[],[],[],[],[],[]];
       for (x = 0; x < this.grid.length; x += 1) {
@@ -154,10 +154,61 @@
         if (empty.length === 1) {
           index = columns[i].indexOf(null);
           number = this.diff(this.ARRAY, columns[i]);
-          this.grid[index][i] = number;
+          this.grid[index][i] = number[0];
           console.info('solved one number ..');
-          this.drawBlock(index, i, number);
+          this.drawBlock(index, i, number[0]);
           return true;
+        }
+      }
+      return false;
+    },
+
+    checkBlock: function( i, Y, X ) {
+      var y, x, block = [];
+      block[i] = []; // Initialize block
+      for (y = Y.start; y < Y.stop; y += 1) {
+        block[i][y] = [];
+        for (x = X.start; x < X.stop; x += 1) {
+          block[i][y][x] = this.grid[y][x];
+        }
+      }
+      console.log('BLOCK %i: %o', i, block[i]);
+      return block[i];
+    },
+
+    checkBlocksForOneMissingNumber: function() {
+      console.log('checking blocks for one missing number ..');
+      var i, block, empty, full, number;
+      // iterate over all blocks
+      for (i = 0; i < 9; i += 1) {
+        empty = []; // Reset empty array
+        full = []; // Reset full array
+        switch (i) {
+          case 0: block = this.checkBlock(i, {start:0, stop:3}, {start:0, stop:3}); break;
+          //case 1: block = this.checkBlock(i, {start:0, stop:3}, {start:3, stop:6}); break;
+          //case 2: this.checkBlock(i, {start:0, stop:3}, {start:6, stop:9}); break;
+          //case 3: this.checkBlock(i, {start:3, stop:6}, {start:0, stop:3}); break;
+          //case 4: this.checkBlock(i, {start:3, stop:6}, {start:3, stop:6}); break;
+          //case 5: this.checkBlock(i, {start:3, stop:6}, {start:6, stop:9}); break;
+          //case 6: this.checkBlock(i, {start:6, stop:9}, {start:0, stop:3}); break;
+          //case 7: this.checkBlock(i, {start:6, stop:9}, {start:3, stop:6}); break;
+          //case 8: this.checkBlock(i, {start:6, stop:9}, {start:6, stop:9}); break;
+        }
+
+        if (i === 0) {
+          for (var c = 0; c < block.length; c += 1) {
+            full = full.concat(block[c]);
+          }
+          empty = full.filter(function( item ) {
+            return item === null;
+          });
+          console.log("EMPTY HERE: ", empty);
+          if (empty.length === 1) {
+            // TODO: continue from here
+            // index = ..
+            number = this.diff(this.ARRAY, full);
+            console.log('MISSING NUMBER IS: ', number[0]);
+          }
         }
       }
       return false;
@@ -167,9 +218,11 @@
       console.log('solving ..\n');
       var notStuck = true;
       while (notStuck) {
-        notStuck = this.checkHorizontalLines();
+        notStuck = this.checkHorizontalLinesForOneMissingNumber();
         if (notStuck) continue;
-        notStuck = this.checkVerticalLines();
+        notStuck = this.checkVerticalLinesForOneMissingNumber();
+        if (notStuck) continue;
+        notStuck = this.checkBlocksForOneMissingNumber();
       }
       console.log('\nstuck ..');
     },
@@ -216,13 +269,13 @@
       //this.grid[3][5] = 5;
       //this.grid[6][0] = 8;
 
-      // Test if checkHorizontalLines works
+      // Test if checking horizontal lines for one missing number works
       //this.grid[1][0] = 1;
       //this.grid[1][4] = 8;
       //this.grid[7][0] = 4;
       //this.grid[7][4] = 3;
 
-      // Test if checkVerticalLines works
+      // Test if checking vertical lines for one missing number works
       //this.grid[0][2] = 7;
       //this.grid[2][2] = 2;
       //this.grid[4][2] = 6;
@@ -231,6 +284,14 @@
       //this.grid[4][5] = 6;
       //this.grid[5][5] = 5;
       //this.grid[6][5] = 2;
+
+      // Test if checking blocks for one missing number works
+      this.grid[0][1] = 5;
+      this.grid[0][2] = 7;
+      //this.grid[1][0] = 1;
+      this.grid[2][0] = 4;
+      this.grid[2][1] = 9;
+      this.grid[2][2] = 2;
     }
   };
 
