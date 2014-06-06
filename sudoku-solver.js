@@ -172,42 +172,48 @@
           block[i][y][x] = this.grid[y][x];
         }
       }
-      console.log('BLOCK %i: %o', i, block[i]);
+      //console.log('BLOCK %i: %o', i, block[i]);
       return block[i];
     },
 
     checkBlocksForOneMissingNumber: function() {
       console.log('checking blocks for one missing number ..');
-      var i, block, empty, full, number;
+      var i, c, block, empty, full, number, index, blah;
       // iterate over all blocks
       for (i = 0; i < 9; i += 1) {
         empty = []; // Reset empty array
         full = []; // Reset full array
         switch (i) {
           case 0: block = this.checkBlock(i, {start:0, stop:3}, {start:0, stop:3}); break;
-          //case 1: block = this.checkBlock(i, {start:0, stop:3}, {start:3, stop:6}); break;
-          //case 2: this.checkBlock(i, {start:0, stop:3}, {start:6, stop:9}); break;
-          //case 3: this.checkBlock(i, {start:3, stop:6}, {start:0, stop:3}); break;
-          //case 4: this.checkBlock(i, {start:3, stop:6}, {start:3, stop:6}); break;
-          //case 5: this.checkBlock(i, {start:3, stop:6}, {start:6, stop:9}); break;
-          //case 6: this.checkBlock(i, {start:6, stop:9}, {start:0, stop:3}); break;
-          //case 7: this.checkBlock(i, {start:6, stop:9}, {start:3, stop:6}); break;
-          //case 8: this.checkBlock(i, {start:6, stop:9}, {start:6, stop:9}); break;
+          case 1: block = this.checkBlock(i, {start:0, stop:3}, {start:3, stop:6}); break;
+          case 2: block = this.checkBlock(i, {start:0, stop:3}, {start:6, stop:9}); break;
+          case 3: block = this.checkBlock(i, {start:3, stop:6}, {start:0, stop:3}); break;
+          case 4: block = this.checkBlock(i, {start:3, stop:6}, {start:3, stop:6}); break;
+          case 5: block = this.checkBlock(i, {start:3, stop:6}, {start:6, stop:9}); break;
+          case 6: block = this.checkBlock(i, {start:6, stop:9}, {start:0, stop:3}); break;
+          case 7: block = this.checkBlock(i, {start:6, stop:9}, {start:3, stop:6}); break;
+          case 8: block = this.checkBlock(i, {start:6, stop:9}, {start:6, stop:9}); break;
         }
 
-        if (i === 0) {
-          for (var c = 0; c < block.length; c += 1) {
-            full = full.concat(block[c]);
-          }
-          empty = full.filter(function( item ) {
-            return item === null;
-          });
-          console.log("EMPTY HERE: ", empty);
-          if (empty.length === 1) {
-            // TODO: continue from here
-            // index = ..
-            number = this.diff(this.ARRAY, full);
-            console.log('MISSING NUMBER IS: ', number[0]);
+        if (i === 0 || i === 1 || i === 2) blah = 0;
+        if (i === 3 || i === 4 || i === 5) blah = 3;
+        if (i === 6 || i === 7 || i === 8) blah = 6;
+
+        for (c = blah; c < block.length; c += 1) {
+          full = full.concat(block[c]);
+        }
+        empty = full.filter(function( item ) {
+          return item === null;
+        });
+        if (empty.length === 1) {
+          number = this.diff(this.ARRAY, full);
+          for (c = blah; c < block.length; c += 1) {
+            index = block[c].indexOf(null);
+            if (index !== -1) {
+              this.grid[c][index] = number[0];
+              this.drawBlock(c, index, number[0]);
+              return true;
+            }
           }
         }
       }
@@ -286,12 +292,32 @@
       //this.grid[6][5] = 2;
 
       // Test if checking blocks for one missing number works
-      this.grid[0][1] = 5;
-      this.grid[0][2] = 7;
-      //this.grid[1][0] = 1;
-      this.grid[2][0] = 4;
-      this.grid[2][1] = 9;
-      this.grid[2][2] = 2;
+      //this.grid[0][1] = 5;
+      //this.grid[0][2] = 7;
+      ////this.grid[1][0] = 1;
+      //this.grid[2][0] = 4;
+      //this.grid[2][1] = 9;
+      //this.grid[2][2] = 2;
+
+      //this.grid[2][5] = 1;
+
+      //this.grid[0][6] = 4;
+      ////this.grid[0][7] = 1;
+      //this.grid[1][8] = 8;
+      //this.grid[2][6] = 3;
+      //this.grid[2][7] = 7;
+      //this.grid[2][8] = 6;
+
+      //this.grid[3][0] = 2;
+      //this.grid[3][1] = 1;
+      //this.grid[4][2] = 6;
+      //this.grid[5][0] = 9;
+
+      //this.grid[6][6] = 1;
+      //this.grid[6][7] = 3;
+      //this.grid[6][8] = 9;
+      //this.grid[8][6] = 8;
+      //this.grid[8][7] = 2;
     }
   };
 
