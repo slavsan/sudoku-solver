@@ -1,4 +1,6 @@
 body {
+    font-family: sans-serif;
+    font-size: 0.9em;
     padding: 80px 145px;
     -webkit-user-select: none;  /* Chrome all / Safari all */
     -moz-user-select: none;     /* Firefox all */

@@ -68,11 +68,11 @@
 
     blocksWithOneUnknown: function( matrix ) {
       // Test block 0
-      //matrix.grid[0][1] = 5;
-      //matrix.grid[0][2] = 7;
-      //matrix.grid[2][0] = 4;
-      //matrix.grid[2][1] = 9;
-      //matrix.grid[2][2] = 2;
+      matrix.grid[0][1] = 5;
+      matrix.grid[0][2] = 7;
+      matrix.grid[2][0] = 4;
+      matrix.grid[2][1] = 9;
+      matrix.grid[2][2] = 2;
 
       // Test block 1
       //matrix.grid[2][5] = 1;

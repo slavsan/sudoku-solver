@@ -10,6 +10,7 @@
     this.x = x;
     this.y = y;
     this.abort = false;
+    this.stuck = false;
     this.init();
   }
   Matrix.prototype = {
@@ -55,7 +56,7 @@
         for (y = 0; y < this.grid[x].length; y += 1) {
           block = this.createBlock(line, x, y);
           if (this.grid[x][y] !== null) {
-            block.innerText = this.grid[x][y];
+            block.textContent = this.grid[x][y];
             block.classList.add('default');
           }
         }
@@ -64,7 +65,7 @@
 
     drawBlock: function( x, y, number ) {
       var div = document.querySelector('#block-' + x + '-' + y);
-      div.innerText = number;
+      div.textContent = number;
     },
 
     checkForDuplicates: function( list ) {
@@ -144,6 +145,7 @@
           this.grid[i][index] = number[0];
           console.info('solved one number ..');
           this.drawBlock(i, index, number[0]);
+          this.stuck = false;
           return true;
         }
       }
@@ -174,6 +176,7 @@
           this.grid[index][i] = number[0];
           console.info('solved one number ..');
           this.drawBlock(index, i, number[0]);
+          this.stuck = false;
           return true;
         }
       }
@@ -195,7 +198,7 @@
 
     checkBlocksForOneMissingNumber: function() {
       console.log('checking blocks for one missing number ..');
-      var i, c, block, empty, full, number, index, blah;
+      var i, c, block, empty, full, number, index, section;
       // iterate over all blocks
       for (i = 0; i < 9; i += 1) {
         empty = []; // Reset empty array
@@ -212,21 +215,22 @@
           case 8: block = this.checkBlock(i, {start:6, stop:9}, {start:6, stop:9}); break;
         }
 
-        if (i === 0 || i === 1 || i === 2) blah = 0;
-        if (i === 3 || i === 4 || i === 5) blah = 3;
-        if (i === 6 || i === 7 || i === 8) blah = 6;
+        if (i >= 0 && i <= 2) section = 0;
+        if (i >= 3 && i <= 5) section = 3;
+        if (i >= 6 && i <= 8) section = 6;
 
-        for (c = blah; c < block.length; c += 1) {
+        for (c = section; c < block.length; c += 1) {
           full = full.concat(block[c]);
         }
         empty = this.filter(full);
         if (empty.length === 1) {
           number = this.diff(this.ARRAY, full);
-          for (c = blah; c < block.length; c += 1) {
+          for (c = section; c < block.length; c += 1) {
             index = block[c].indexOf(null);
             if (index !== -1) {
               this.grid[c][index] = number[0];
               this.drawBlock(c, index, number[0]);
+              this.stuck = false;
               return true;
             }
           }
@@ -238,17 +242,16 @@
     solve: function() {
       if (this.abort) return false;
       console.log('solving ..\n');
-      var notStuck = true;
-      while (notStuck) {
-        notStuck = this.checkHorizontalLinesForOneMissingNumber();
-        if (notStuck) continue;
-        notStuck = this.checkVerticalLinesForOneMissingNumber();
-        if (notStuck) continue;
-        notStuck = this.checkBlocksForOneMissingNumber();
+      while (this.stuck === false) {
+        this.stuck = true;
+        this.checkHorizontalLinesForOneMissingNumber();
+        this.checkVerticalLinesForOneMissingNumber();
+        this.checkBlocksForOneMissingNumber();
       }
 
-      this.validate();
-      console.log('\nstuck ..');
+      this.validate(); // Validate when finished solving
+
+      if (this.stuck) console.log('\nstuck ..');
     }
 
   };
