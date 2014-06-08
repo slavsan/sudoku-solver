@@ -55,6 +55,11 @@
       matrix.grid[7][4] = 8;
     },
 
+    horizontalLineWithTwoUnknown: function( matrix ) {
+      matrix.grid[1][4] = 7;
+      matrix.grid[7][8] = 4;
+    },
+
     verticalLineWithOneUnknown: function(matrix) {
       matrix.grid[0][2] = 7;
       matrix.grid[2][2] = 2;

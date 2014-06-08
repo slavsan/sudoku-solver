@@ -10,6 +10,7 @@
   //test.horizontalLineWithOneUnknown(sudoku);
   //test.verticalLineWithOneUnknown(sudoku);
   //test.blocksWithOneUnknown(sudoku);
+  //test.horizontalLineWithTwoUnknown(sudoku);
 
   sudoku.draw();
   sudoku.validate();
