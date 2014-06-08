@@ -1,0 +1,37 @@
+body {
+    padding: 150px;
+}
+#main {
+    display: inline-block;
+    border-top: 2px solid #222;
+    border-left: 2px solid #222;
+    border-bottom: 2px solid #222;
+}
+#main div.line {
+    display: block;
+    text-align: center;
+    color: #444;
+}
+#main div.block {
+    border: 1px solid #aaa;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    vertical-align: top;
+    margin: -1px 0 0 -1px;
+    line-height: 40px;
+}
+#main div.block.error {
+    background: red;
+}
+#main div.default {
+    color: #000;
+    font-weight: bold;
+}
+#main div.line:nth-child(4),
+#main div.line:nth-child(7) {
+    border-top: 2px solid #222;
+}
+#main div.block:nth-child(3n+0) {
+    border-right: 2px solid #000;
+}

@@ -1,4 +1,5 @@
 (function(){
+  "use strict";
 
   function DuplicateItemError( errorMessage, listItem ) {
     return {msg:errorMessage, item:listItem};
@@ -8,11 +9,8 @@
     this.ARRAY = [1,2,3,4,5,6,7,8,9];
     this.x = x;
     this.y = y;
+    this.abort = false;
     this.init();
-    this.prefill();
-    this.draw();
-    this.validate();
-    this.solve();
   }
   Matrix.prototype = {
     constructor: Matrix,
@@ -29,29 +27,44 @@
       //console.log('GRID: %o', this.grid);
     },
 
+    createBlock: function( parentElement, x, y ) {
+      var div = document.createElement('div');
+      div.id = 'block-' + x + '-' + y;
+      div.classList.add('block');
+      parentElement.appendChild(div);
+      return div;
+    },
+
+    createLine: function() {
+      var div = document.createElement('div');
+      document.querySelector('#main').appendChild(div);
+      div.classList.add('line');
+      return div;
+    },
+
+    markAsError: function( x, y ) {
+      var div = document.querySelector('#block-' + x + '-' + y);
+      div.classList.add('error');
+    },
+
     draw: function() {
       console.log('drawing..');
-      var $element;
-      var x, y;
+      var x, y, line, block;
       for (x = 0; x < this.grid.length; x += 1) {
+        line = this.createLine();
         for (y = 0; y < this.grid[x].length; y += 1) {
-          if (y == 8) {
-            $element = $('<div id="block-' + x + '-' + y + '"></div><br />').appendTo('#main');
-          } else {
-            $element = $('<div id="block-' + x + '-' + y + '"></div>').appendTo('#main');
-          }
-          if (this.grid[x][y] == null) {
-            $element.html("&nbsp;");
-          } else {
-            $element.html(this.grid[x][y]);
-            $element.addClass('default-value');
+          block = this.createBlock(line, x, y);
+          if (this.grid[x][y] !== null) {
+            block.innerText = this.grid[x][y];
+            block.classList.add('default');
           }
         }
       }
     },
 
-    drawBlock: function( x, y, num ) {
-      $('#block-' + x + '-' + y).text(num);
+    drawBlock: function( x, y, number ) {
+      var div = document.querySelector('#block-' + x + '-' + y);
+      div.innerText = number;
     },
 
     checkForDuplicates: function( list ) {
@@ -75,7 +88,8 @@
           this.checkForDuplicates(this.grid[x]);
         } catch (e) {
           console.log(e);
-          $('#block-' + x + '-' + e.item).css('background', 'red');
+          this.markAsError(x, e.item);
+          this.abort = true;
           return false;
         }
 
@@ -97,7 +111,8 @@
           this.checkForDuplicates(columns[y]);
         } catch (e) {
           console.log(e);
-          $('#block-' + e.item + '-' + y).css('background', 'red');
+          this.markAsError(e.item, y);
+          this.abort = true;
           return false;
         }
       }
@@ -108,17 +123,21 @@
 
     diff: function( arr1, arr2 ) {
       return arr1.filter(function( arr1 ){
-        return arr2.indexOf(arr1) == -1;
-      })
+        return arr2.indexOf(arr1) === -1;
+      });
+    },
+
+    filter: function( arr ) {
+      return arr.filter(function( item ) {
+        return item === null;
+      });
     },
 
     checkHorizontalLinesForOneMissingNumber: function() {
       console.log('checking horizontal lines for one missing number ..');
       var empty, index, number;
       for (var i = 0; i < this.grid.length; i += 1) {
-        empty = this.grid[i].filter(function( item ) {
-          return item === null;
-        });
+        empty = this.filter(this.grid[i]);
         if (empty.length === 1) {
           index = this.grid[i].indexOf(null);
           number = this.diff(this.ARRAY, this.grid[i]);
@@ -148,9 +167,7 @@
       }
       var empty, index, number;
       for (var i = 0; i < columns.length; i += 1) {
-        empty = columns[i].filter(function( item ) {
-          return item === null;
-        });
+        empty = this.filter(columns[i]);
         if (empty.length === 1) {
           index = columns[i].indexOf(null);
           number = this.diff(this.ARRAY, columns[i]);
@@ -202,9 +219,7 @@
         for (c = blah; c < block.length; c += 1) {
           full = full.concat(block[c]);
         }
-        empty = full.filter(function( item ) {
-          return item === null;
-        });
+        empty = this.filter(full);
         if (empty.length === 1) {
           number = this.diff(this.ARRAY, full);
           for (c = blah; c < block.length; c += 1) {
@@ -221,6 +236,7 @@
     },
 
     solve: function() {
+      if (this.abort) return false;
       console.log('solving ..\n');
       var notStuck = true;
       while (notStuck) {
@@ -230,99 +246,14 @@
         if (notStuck) continue;
         notStuck = this.checkBlocksForOneMissingNumber();
       }
+
+      this.validate();
       console.log('\nstuck ..');
-    },
-
-    prefill: function() {
-      this.grid[0][0] = 8;
-      this.grid[0][3] = 6;
-      this.grid[0][5] = 3;
-      this.grid[0][8] = 2;
-      this.grid[1][1] = 6;
-      this.grid[1][2] = 3;
-      this.grid[1][3] = 2;
-      this.grid[1][5] = 4;
-      this.grid[1][6] = 9;
-      this.grid[1][7] = 5;
-      this.grid[2][4] = 5;
-      this.grid[3][2] = 5;
-      this.grid[3][6] = 7;
-      this.grid[4][0] = 7;
-      this.grid[4][1] = 8;
-      this.grid[4][7] = 4;
-      this.grid[4][8] = 3;
-      this.grid[5][2] = 4;
-      this.grid[5][6] = 2;
-      this.grid[6][4] = 6;
-      this.grid[7][1] = 2;
-      this.grid[7][2] = 9;
-      this.grid[7][3] = 1;
-      this.grid[7][5] = 7;
-      this.grid[7][6] = 5;
-      this.grid[7][7] = 6;
-      this.grid[8][0] = 5;
-      this.grid[8][3] = 3;
-      this.grid[8][5] = 9;
-      this.grid[8][8] = 7;
-
-
-
-
-      // .. Testing
-
-      // Test if validation works
-      //this.grid[0][7] = 8;
-      //this.grid[3][5] = 5;
-      //this.grid[6][0] = 8;
-
-      // Test if checking horizontal lines for one missing number works
-      //this.grid[1][0] = 1;
-      //this.grid[1][4] = 8;
-      //this.grid[7][0] = 4;
-      //this.grid[7][4] = 3;
-
-      // Test if checking vertical lines for one missing number works
-      //this.grid[0][2] = 7;
-      //this.grid[2][2] = 2;
-      //this.grid[4][2] = 6;
-      //this.grid[6][2] = 8;
-      //this.grid[2][5] = 1;
-      //this.grid[4][5] = 6;
-      //this.grid[5][5] = 5;
-      //this.grid[6][5] = 2;
-
-      // Test if checking blocks for one missing number works
-      //this.grid[0][1] = 5;
-      //this.grid[0][2] = 7;
-      ////this.grid[1][0] = 1;
-      //this.grid[2][0] = 4;
-      //this.grid[2][1] = 9;
-      //this.grid[2][2] = 2;
-
-      //this.grid[2][5] = 1;
-
-      //this.grid[0][6] = 4;
-      ////this.grid[0][7] = 1;
-      //this.grid[1][8] = 8;
-      //this.grid[2][6] = 3;
-      //this.grid[2][7] = 7;
-      //this.grid[2][8] = 6;
-
-      //this.grid[3][0] = 2;
-      //this.grid[3][1] = 1;
-      //this.grid[4][2] = 6;
-      //this.grid[5][0] = 9;
-
-      //this.grid[6][6] = 1;
-      //this.grid[6][7] = 3;
-      //this.grid[6][8] = 9;
-      //this.grid[8][6] = 8;
-      //this.grid[8][7] = 2;
     }
+
   };
 
 
-
-  new Matrix(9, 9);
+  window.Matrix = Matrix;
 
 }());
