@@ -1,5 +1,10 @@
 body {
-    padding: 150px;
+    padding: 80px 145px;
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+
+    user-select: none;
 }
 #main {
     display: inline-block;
@@ -20,9 +25,11 @@ body {
     vertical-align: top;
     margin: -1px 0 0 -1px;
     line-height: 40px;
+    color: blue;
 }
 #main div.block.error {
-    background: red;
+    background: pink !important;
+    color: darkred;
 }
 #main div.default {
     color: #000;
@@ -34,4 +41,19 @@ body {
 }
 #main div.block:nth-child(3n+0) {
     border-right: 2px solid #000;
+}
+#main div.line:nth-child(-n+3) .block:nth-child(-n+3),      /* top left */
+#main div.line:nth-child(-n+3) .block:nth-child(n+7),       /* top right */
+#main div.line:nth-child(n+7) .block:nth-child(-n+3),       /* bottom left */
+#main div.line:nth-child(n+7) .block:nth-child(n+7),        /* bottom right */
+#main div.line:nth-child(4) .block:nth-child(4),            /* center */
+#main div.line:nth-child(4) .block:nth-child(5),
+#main div.line:nth-child(4) .block:nth-child(6),
+#main div.line:nth-child(5) .block:nth-child(4),
+#main div.line:nth-child(5) .block:nth-child(5),
+#main div.line:nth-child(5) .block:nth-child(6),
+#main div.line:nth-child(6) .block:nth-child(4),
+#main div.line:nth-child(6) .block:nth-child(5),
+#main div.line:nth-child(6) .block:nth-child(6) {
+    background: #eee;
 }

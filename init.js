@@ -9,7 +9,7 @@
   //test.verticalValidation(sudoku);
   //test.horizontalLineWithOneUnknown(sudoku);
   //test.verticalLineWithOneUnknown(sudoku);
-  test.blocksWithOneUnknown(sudoku);
+  //test.blocksWithOneUnknown(sudoku);
 
   sudoku.draw();
   sudoku.validate();
