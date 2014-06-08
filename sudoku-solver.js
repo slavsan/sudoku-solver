@@ -25,7 +25,6 @@
           this.grid[i][y] = null;
         }
       }
-      //console.log('GRID: %o', this.grid);
     },
 
     createBlock: function( parentElement, x, y ) {
@@ -81,8 +80,7 @@
 
     validate: function() {
       console.log('validating ..');
-      var x, y;
-      var columns = [[],[],[],[],[],[],[],[],[]];
+      var x, y, columns = this.getColumns();
       // Checking horizontal lines
       for (x = 0; x < this.grid.length; x += 1) {
         try {
@@ -91,19 +89,7 @@
           console.log(e);
           this.markAsError(x, e.item);
           this.abort = true;
-          return false;
         }
-
-        // Store columns data
-        columns[0].push(this.grid[x][0]);
-        columns[1].push(this.grid[x][1]);
-        columns[2].push(this.grid[x][2]);
-        columns[3].push(this.grid[x][3]);
-        columns[4].push(this.grid[x][4]);
-        columns[5].push(this.grid[x][5]);
-        columns[6].push(this.grid[x][6]);
-        columns[7].push(this.grid[x][7]);
-        columns[8].push(this.grid[x][8]);
       }
 
       // Checking vertical lines
@@ -114,12 +100,10 @@
           console.log(e);
           this.markAsError(e.item, y);
           this.abort = true;
-          return false;
         }
       }
 
       console.log('.. seems valid');
-      return true;
     },
 
     diff: function( arr1, arr2 ) {
@@ -142,18 +126,34 @@
       return column;
     },
 
+    getColumns: function() {
+      var x, columns = [[],[],[],[],[],[],[],[],[]];
+      for (x = 0; x < this.grid.length; x += 1) {
+        columns[0].push(this.grid[x][0]);
+        columns[1].push(this.grid[x][1]);
+        columns[2].push(this.grid[x][2]);
+        columns[3].push(this.grid[x][3]);
+        columns[4].push(this.grid[x][4]);
+        columns[5].push(this.grid[x][5]);
+        columns[6].push(this.grid[x][6]);
+        columns[7].push(this.grid[x][7]);
+        columns[8].push(this.grid[x][8]);
+      }
+      return columns;
+    },
+
     getBlockAtIndex: function( index ) {
       var block;
       switch (index) {
-        case 0: block = this.checkBlock(index, {start:0, stop:3}, {start:0, stop:3}); break;
-        case 1: block = this.checkBlock(index, {start:0, stop:3}, {start:3, stop:6}); break;
-        case 2: block = this.checkBlock(index, {start:0, stop:3}, {start:6, stop:9}); break;
-        case 3: block = this.checkBlock(index, {start:3, stop:6}, {start:0, stop:3}); break;
-        case 4: block = this.checkBlock(index, {start:3, stop:6}, {start:3, stop:6}); break;
-        case 5: block = this.checkBlock(index, {start:3, stop:6}, {start:6, stop:9}); break;
-        case 6: block = this.checkBlock(index, {start:6, stop:9}, {start:0, stop:3}); break;
-        case 7: block = this.checkBlock(index, {start:6, stop:9}, {start:3, stop:6}); break;
-        case 8: block = this.checkBlock(index, {start:6, stop:9}, {start:6, stop:9}); break;
+        case 0: block = this.checkBlock({start:0, stop:3}, {start:0, stop:3}); break;
+        case 1: block = this.checkBlock({start:0, stop:3}, {start:3, stop:6}); break;
+        case 2: block = this.checkBlock({start:0, stop:3}, {start:6, stop:9}); break;
+        case 3: block = this.checkBlock({start:3, stop:6}, {start:0, stop:3}); break;
+        case 4: block = this.checkBlock({start:3, stop:6}, {start:3, stop:6}); break;
+        case 5: block = this.checkBlock({start:3, stop:6}, {start:6, stop:9}); break;
+        case 6: block = this.checkBlock({start:6, stop:9}, {start:0, stop:3}); break;
+        case 7: block = this.checkBlock({start:6, stop:9}, {start:3, stop:6}); break;
+        case 8: block = this.checkBlock({start:6, stop:9}, {start:6, stop:9}); break;
       }
       return block;
     },
@@ -197,6 +197,13 @@
       return false;
     },
 
+    doesHorizontalSquareLineContain: function( x, number ) {
+      var horizontalLine = this.grid[x],
+        index = horizontalLine.indexOf(number);
+      if (index !== -1) return index;
+      return false;
+    },
+
     doesBlockContain: function( blockIndex, number ) {
       var block = this.getBlockNumbers(0, this.getBlockAtIndex(blockIndex)),
         index = block.indexOf(number);
@@ -214,23 +221,13 @@
           unknown = this.diff(this.ARRAY, this.grid[i])[0];
           this.markAsSolved(i, index, unknown);
           this.stuck = false;
-          return true;
         }
       }
-      return false;
     },
 
     solveHorizontalLinesWithTwoUnknown:function() {
       console.log('checking horizontal lines with two unknown ..');
-      // for each line do
-      //    check how many unknown are there
-      //    if 2
-      //        check which indexes of unknown
-      //        for each unknown
-      //            check if square line would exclude one of the two unknown
-      //            check if current block's content would exclude one of the two unknown
-
-      var y, i, e, u, empty, indices = [], index, unknownList, excluded, unknown, blockIndex, block;
+      var y, i, e, u, empty, indices = [], index, unknownList, excluded, unknown;
       solved:
       for (y = 0; y < this.grid.length; y += 1) {
         empty = this.filter(this.grid[y]);
@@ -275,20 +272,7 @@
 
     solveVerticalLinesWithOneUnknown: function() {
       console.log('checking vertical lines with one unknown ..');
-      var x, columns = [[],[],[],[],[],[],[],[],[]];
-      for (x = 0; x < this.grid.length; x += 1) {
-        // Store columns data
-        columns[0].push(this.grid[x][0]);
-        columns[1].push(this.grid[x][1]);
-        columns[2].push(this.grid[x][2]);
-        columns[3].push(this.grid[x][3]);
-        columns[4].push(this.grid[x][4]);
-        columns[5].push(this.grid[x][5]);
-        columns[6].push(this.grid[x][6]);
-        columns[7].push(this.grid[x][7]);
-        columns[8].push(this.grid[x][8]);
-      }
-      var empty, index, unknown;
+      var empty, index, unknown, columns = this.getColumns();
       for (var i = 0; i < columns.length; i += 1) {
         empty = this.filter(columns[i]);
         if (empty.length === 1) {
@@ -296,23 +280,55 @@
           unknown = this.diff(this.ARRAY, columns[i])[0];
           this.markAsSolved(index, i, unknown);
           this.stuck = false;
-          return true;
         }
       }
-      return false;
     },
 
-    checkBlock: function( i, Y, X ) {
-      var y, x, block = [];
-      block[i] = []; // Initialize block
-      for (y = Y.start; y < Y.stop; y += 1) {
-        block[i][y] = [];
-        for (x = X.start; x < X.stop; x += 1) {
-          block[i][y][x] = this.grid[y][x];
+    solveVerticalLinesWithTwoUnknown: function() {
+      console.log('checking vertical lines with two unknown ..');
+      var i, e, u, empty, index, indices = [], excluded, unknown, unknownList, columns = this.getColumns();
+      solved:
+      for (var x = 0; x < columns.length; x += 1) {
+        empty = this.filter(columns[x]);
+        if (empty.length === 2) {
+          unknownList = this.diff(this.ARRAY, columns[x]);
+          for (e = 0; e < columns[x].length; e += 1) {
+            if (columns[x][e] === null) indices.push(e);
+          }
+          for (i = 0; i < indices.length; i += 1) {
+            index = indices[i];
+            for (u = 0; u < unknownList.length; u += 1) {
+              excluded = this.doesHorizontalSquareLineContain(index, unknownList[u]);
+              if (excluded !== false) {
+                unknownList.splice(u, 1);
+                unknown = unknownList[0];
+                this.markAsSolved(index, x, unknown);
+                this.stuck = false;
+                break solved;
+              }
+              excluded = this.doesBlockContain(this.getCurrentBlock(index, x), unknownList[u]);
+              if (excluded !== false) {
+                unknownList.splice(u, 1);
+                unknown = unknownList[0];
+                this.markAsSolved(index, x, unknown);
+                this.stuck = false;
+                break solved;
+              }
+            }
+          }
         }
       }
-      //console.log('BLOCK %i: %o', i, block[i]);
-      return block[i];
+    },
+
+    checkBlock: function( Y, X ) {
+      var y, x, block = [];
+      for (y = Y.start; y < Y.stop; y += 1) {
+        block[y] = [];
+        for (x = X.start; x < X.stop; x += 1) {
+          block[y][x] = this.grid[y][x];
+        }
+      }
+      return block;
     },
 
     solveBlocksWithOneUnknown: function() {
@@ -337,12 +353,10 @@
             if (index !== -1) {
               this.markAsSolved(c, index, unknown);
               this.stuck = false;
-              return true;
             }
           }
         }
       }
-      return false;
     },
 
     solve: function() {
@@ -354,6 +368,7 @@
         this.solveVerticalLinesWithOneUnknown();
         this.solveBlocksWithOneUnknown();
         this.solveHorizontalLinesWithTwoUnknown();
+        this.solveVerticalLinesWithTwoUnknown();
       }
 
       this.validate(); // Validate when finished solving

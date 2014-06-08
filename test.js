@@ -60,7 +60,7 @@
       matrix.grid[7][8] = 4;
     },
 
-    verticalLineWithOneUnknown: function(matrix) {
+    verticalLineWithOneUnknown: function( matrix ) {
       matrix.grid[0][2] = 7;
       matrix.grid[2][2] = 2;
       matrix.grid[4][2] = 6;
@@ -69,6 +69,12 @@
       matrix.grid[4][5] = 1;
       matrix.grid[5][5] = 5;
       matrix.grid[6][5] = 2;
+    },
+
+    verticalLineWithTwoUnknown: function( matrix ) {
+      matrix.grid[0][2] = 1;
+      matrix.grid[2][2] = 2;
+      matrix.grid[4][2] = 6;
     },
 
     blocksWithOneUnknown: function( matrix ) {
