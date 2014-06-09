@@ -162,6 +162,7 @@
       console.info('solved number (%i) at position [%i/%i]', number, y, i);
       this.grid[y][i] = number;
       this.drawBlock(y, i, number);
+      this.stuck = false;
     },
 
     getCurrentBlock: function( y, x ) {
@@ -220,7 +221,6 @@
           index = this.grid[i].indexOf(null);
           unknown = this.diff(this.ARRAY, this.grid[i])[0];
           this.markAsSolved(i, index, unknown);
-          this.stuck = false;
         }
       }
     },
@@ -229,45 +229,78 @@
       console.log('checking horizontal lines with two unknown ..');
       var y, i, e, u, empty, indices = [], index, unknownList, excluded, unknown;
       solved:
-      for (y = 0; y < this.grid.length; y += 1) {
-        empty = this.filter(this.grid[y]);
-        if (empty.length === 2) {
-          unknownList = this.diff(this.ARRAY, this.grid[y]);
-          for (e = 0; e < this.grid[y].length; e += 1) {
-            if (this.grid[y][e] === null) indices.push(e);
-          }
-          //console.log('LIST OF UNKNOWN: ', unknownList);
-          //console.log('INDICES: ', indices);
-          for (i = 0; i < indices.length; i += 1) {
-            index = indices[i];
-            //console.log('CHECK INDEX: %i at block position %i/%i', index, y, index);
-            for (u = 0; u < unknownList.length; u += 1) {
-              //console.log('CHECK FOR UNKNOWN: ', unknownList[u]);
-              excluded = this.doesVerticalSquareLineContain(index, unknownList[u]);
-              if (excluded !== false) {
-                //console.log('VERTICAL LINE CONTAINS: ', unknownList[u]);
-                unknownList.splice(u, 1);
-                unknown = unknownList[0];
-                //console.log('OTHER NUMBER IS: ', unknown);
-                //console.log('COLUMN: ', y);
-                //console.log('INDEX: ', index);
-                this.markAsSolved(y, index, unknown);
-                this.stuck = false;
-                break solved;
+        for (y = 0; y < this.grid.length; y += 1) {
+          empty = this.filter(this.grid[y]);
+          if (empty.length === 2) {
+            unknownList = this.diff(this.ARRAY, this.grid[y]);
+            for (e = 0; e < this.grid[y].length; e += 1) {
+              if (this.grid[y][e] === null) indices.push(e);
+            }
+            //console.log('LIST OF UNKNOWN: ', unknownList);
+            //console.log('INDICES: ', indices);
+            for (i = 0; i < indices.length; i += 1) {
+              index = indices[i];
+              //console.log('CHECK INDEX: %i at block position %i/%i', index, y, index);
+              for (u = 0; u < unknownList.length; u += 1) {
+                //console.log('CHECK FOR UNKNOWN: ', unknownList[u]);
+                excluded = this.doesVerticalSquareLineContain(index, unknownList[u]);
+                if (excluded !== false) {
+                  //console.log('VERTICAL LINE CONTAINS: ', unknownList[u]);
+                  unknownList.splice(u, 1);
+                  unknown = unknownList[0];
+                  //console.log('OTHER NUMBER IS: ', unknown);
+                  //console.log('COLUMN: ', y);
+                  //console.log('INDEX: ', index);
+                  this.markAsSolved(y, index, unknown);
+                  break solved;
+                }
+                excluded = this.doesBlockContain(this.getCurrentBlock(y, index), unknownList[u]);
+                if (excluded !== false) {
+                  //console.log('BLOCK CONTAINS NUMBER: ', unknownList[u]);
+                  unknownList.splice(u, 1);
+                  unknown = unknownList[0];
+                  this.markAsSolved(y, index, unknown);
+                  break solved;
+                }
               }
-              excluded = this.doesBlockContain(this.getCurrentBlock(y, index), unknownList[u]);
-              if (excluded !== false) {
-                //console.log('BLOCK CONTAINS NUMBER: ', unknownList[u]);
-                unknownList.splice(u, 1);
-                unknown = unknownList[0];
-                this.markAsSolved(y, index, unknown);
-                this.stuck = false;
+            }
+          }
+        }
+    },
+
+    solveHorizontalLinesWithThreeUnknown: function() {
+      console.log('checking horizontal lines with three unknown ..');
+      var y, e, u, empty, indices, index, unknownList, possible;
+      solved:
+        for (y = 0; y < this.grid.length; y += 1) {
+          empty = this.filter(this.grid[y]);
+          if (empty.length === 3) {
+            unknownList = this.diff(this.ARRAY, this.grid[y]);
+            indices = [];
+            for (e = 0; e < this.grid[y].length; e += 1) {
+              if (this.grid[y][e] === null) indices.push(e);
+            }
+
+            // TODO: in case
+            // for each index
+            //    for each unknown
+            //        check if possible
+            //            if possible values are 1 / solved
+
+            for (u = 0; u < unknownList.length; u += 1) {
+              possible = [];
+              for (index = 0; index < indices.length; index += 1) {
+                if (!(this.doesVerticalSquareLineContain(indices[index], unknownList[u])) && !(this.doesBlockContain(this.getCurrentBlock(y, indices[index]), unknownList[u]))) {
+                  possible.push({index:indices[index], unknown:unknownList[u]});
+                }
+              }
+              if (possible.length === 1) {
+                this.markAsSolved(y, possible[0].index, possible[0].unknown);
                 break solved;
               }
             }
           }
         }
-      }
     },
 
     solveVerticalLinesWithOneUnknown: function() {
@@ -279,7 +312,6 @@
           index = columns[i].indexOf(null);
           unknown = this.diff(this.ARRAY, columns[i])[0];
           this.markAsSolved(index, i, unknown);
-          this.stuck = false;
         }
       }
     },
@@ -288,36 +320,34 @@
       console.log('checking vertical lines with two unknown ..');
       var i, e, u, empty, index, indices = [], excluded, unknown, unknownList, columns = this.getColumns();
       solved:
-      for (var x = 0; x < columns.length; x += 1) {
-        empty = this.filter(columns[x]);
-        if (empty.length === 2) {
-          unknownList = this.diff(this.ARRAY, columns[x]);
-          for (e = 0; e < columns[x].length; e += 1) {
-            if (columns[x][e] === null) indices.push(e);
-          }
-          for (i = 0; i < indices.length; i += 1) {
-            index = indices[i];
-            for (u = 0; u < unknownList.length; u += 1) {
-              excluded = this.doesHorizontalSquareLineContain(index, unknownList[u]);
-              if (excluded !== false) {
-                unknownList.splice(u, 1);
-                unknown = unknownList[0];
-                this.markAsSolved(index, x, unknown);
-                this.stuck = false;
-                break solved;
-              }
-              excluded = this.doesBlockContain(this.getCurrentBlock(index, x), unknownList[u]);
-              if (excluded !== false) {
-                unknownList.splice(u, 1);
-                unknown = unknownList[0];
-                this.markAsSolved(index, x, unknown);
-                this.stuck = false;
-                break solved;
+        for (var x = 0; x < columns.length; x += 1) {
+          empty = this.filter(columns[x]);
+          if (empty.length === 2) {
+            unknownList = this.diff(this.ARRAY, columns[x]);
+            for (e = 0; e < columns[x].length; e += 1) {
+              if (columns[x][e] === null) indices.push(e);
+            }
+            for (i = 0; i < indices.length; i += 1) {
+              index = indices[i];
+              for (u = 0; u < unknownList.length; u += 1) {
+                excluded = this.doesHorizontalSquareLineContain(index, unknownList[u]);
+                if (excluded !== false) {
+                  unknownList.splice(u, 1);
+                  unknown = unknownList[0];
+                  this.markAsSolved(index, x, unknown);
+                  break solved;
+                }
+                excluded = this.doesBlockContain(this.getCurrentBlock(index, x), unknownList[u]);
+                if (excluded !== false) {
+                  unknownList.splice(u, 1);
+                  unknown = unknownList[0];
+                  this.markAsSolved(index, x, unknown);
+                  break solved;
+                }
               }
             }
           }
         }
-      }
     },
 
     checkBlock: function( Y, X ) {
@@ -352,7 +382,6 @@
             index = block[c].indexOf(null);
             if (index !== -1) {
               this.markAsSolved(c, index, unknown);
-              this.stuck = false;
             }
           }
         }
@@ -369,6 +398,7 @@
         this.solveBlocksWithOneUnknown();
         this.solveHorizontalLinesWithTwoUnknown();
         this.solveVerticalLinesWithTwoUnknown();
+        this.solveHorizontalLinesWithThreeUnknown();
       }
 
       this.validate(); // Validate when finished solving
