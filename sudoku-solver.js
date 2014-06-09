@@ -389,8 +389,8 @@
       }
     },
 
-    solveBlocksWithFiveUnknown: function() {
-      console.log('checking blocks with five unknown ..');
+    solveBlocksWithUnknown: function( limit ) {
+      console.log("solving blocks with %i unknown ..", limit);
       var i, y, x, e, c, u, block, empty, full, unknown, indices, index, section, possible, unknownList;
       // iterate over all blocks
       solved:
@@ -398,10 +398,6 @@
           empty = []; // Reset empty array
           full = []; // Reset full array
           block = this.getBlockAtIndex(i);
-
-//        if (i >= 0 && i <= 2) section = 0;
-//        if (i >= 3 && i <= 5) section = 3;
-//        if (i >= 6 && i <= 8) section = 6;
 
           switch (i) {
             case 0: section = {y:{start:0, stop:3}, x:{start:0, stop:3}}; break;
@@ -418,37 +414,55 @@
           full = this.getBlockNumbers(section.y.start, block);
           empty = this.filter(full);
 
-          if (empty.length === 5) {
-            console.log('BLOCK INDEX: ', i);
-            console.log('FULL: ', full);
-            console.log('EMPTY: ', empty);
+          if (empty.length === limit) {
+            //console.log('BLOCK INDEX: ', i);
+            //console.log('FULL: ', full);
+            //console.log('EMPTY: ', empty);
+
+            if (i === 6) {
+              console.log('BLOCK INDEX 6 HERE: ', full);
+            }
 
             unknownList = this.diff(this.ARRAY, full);
 
-            console.log("UNKNOWN LIST: ", unknownList);
+            //console.log("UNKNOWN LIST: ", unknownList);
 
             for (u = 0; u < unknownList.length; u += 1) {
-              console.log('CHECK FOR NUMBER: ', unknownList[u]);
+              //console.log('CHECK FOR NUMBER: ', unknownList[u]);
               indices = [];
+
 
               //console.log('BLOCK 2', block);
               for (y = section.y.start; y < section.y.stop; y += 1) {
                 for (x = section.x.start; x < section.x.stop; x +=1 ) {
-                  console.log('BLOCK: (%i/%i) ', y, x);
-                  //console.log('BLOCK: (%i/%i) ', e, c, block[y][x]);
+                  //console.log('BLOCK: (%i/%i) ', y, x);
                   if (this.grid[y][x] === null) indices.push({y:y,x:x});
                 }
                 //if (block[x][e] === null) indices.push(e);
               }
 
-              console.log('INDICES: ', indices);
+              if (i === 6) {
+                console.log('BLOCK INDEX 6 HERE [INDICES]: ', indices);
+              }
+
+              //console.log('INDICES: ', indices);
 
               possible = [];
               for (index = 0; index < indices.length; index += 1) {
-                if (!(this.doesVerticalSquareLineContain(indices[index].x, unknownList[u])) && !(this.doesHorizontalSquareLineContain(indices[index].y, unknownList[u]))) {
-                  possible.push({y: indices[index].y, x:indices[index].x, unknown:unknownList[u]});
+                if (i === 6) {
+                  console.log('DOES VERTICAL SQUARE LINE CONTAIN: ', this.doesVerticalSquareLineContain(indices[index].x, unknownList[u]));
+                  console.log('DOES HORIZONTAL SQUARE LINE CONTAIN: ', this.doesHorizontalSquareLineContain(indices[index].y, unknownList[u]));
+                }
+                if (this.doesVerticalSquareLineContain(indices[index].x, unknownList[u]) === false && this.doesHorizontalSquareLineContain(indices[index].y, unknownList[u]) === false) {
+                  possible.push({y:indices[index].y, x:indices[index].x, unknown:unknownList[u]});
                 }
               }
+
+              if (i === 6) {
+                console.log('BLOCK INDEX HERE [POSSIBLE]: %o', possible);
+                console.log("GRID: ", this.grid);
+              }
+
               if (possible.length === 1) {
                 console.log('SOLVED: number %i at position %i/%i', possible[0].unknown, possible[0].y, possible[0].x);
                 this.markAsSolved(possible[0].y, possible[0].x, possible[0].unknown);
@@ -473,7 +487,14 @@
         this.solveVerticalLinesWithTwoUnknown();
         this.solveHorizontalLinesWithThreeUnknown();
         //this.solveVerticalLinesWithThreeUnknown();
-        this.solveBlocksWithFiveUnknown();
+        this.solveBlocksWithUnknown(2);
+        this.solveBlocksWithUnknown(3);
+        this.solveBlocksWithUnknown(4);
+        this.solveBlocksWithUnknown(5);
+        this.solveBlocksWithUnknown(6);
+        this.solveBlocksWithUnknown(7);
+        this.solveBlocksWithUnknown(8);
+        this.solveBlocksWithUnknown(9);
         console.groupEnd();
       }
 
