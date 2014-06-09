@@ -28,10 +28,19 @@
       }
     },
 
-    createBlock: function( parentElement, x, y ) {
+    setDefaultValue: function( y, x, number ) {
+      var div = document.querySelector('#block-' + y + '-' + x);
+      this.grid[y][x] = number;
+      div.innerHTML = number;
+      div.classList.add('default');
+    },
+
+    createBlock: function( parentElement, y, x ) {
       var div = document.createElement('div');
-      div.id = 'block-' + x + '-' + y;
+      div.id = 'block-' + y + '-' + x;
       div.classList.add('block');
+      div.setAttribute('y', y);
+      div.setAttribute('x', x);
       parentElement.appendChild(div);
       return div;
     },

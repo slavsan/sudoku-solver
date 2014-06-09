@@ -14,6 +14,12 @@ body {
     border-left: 2px solid #222;
     border-bottom: 2px solid #222;
 }
+.actions  {
+    margin: 20px 0 0 0;
+}
+.actions button {
+    padding: 4px 10px;
+}
 #main div.line {
     display: block;
     text-align: center;
@@ -28,6 +34,12 @@ body {
     margin: -1px 0 0 -1px;
     line-height: 40px;
     color: blue;
+}
+#main div.block input {
+    outline: 0;
+    border: none;
+    width: 20px;
+    background: transparent;
 }
 #main div.block.error {
     background: pink !important;
