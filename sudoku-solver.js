@@ -11,6 +11,7 @@
     this.y = y;
     this.abort = false;
     this.stuck = false;
+    this.attempts = 0;
     this.init();
   }
   Matrix.prototype = {
@@ -388,10 +389,82 @@
       }
     },
 
+    solveBlocksWithFiveUnknown: function() {
+      console.log('checking blocks with five unknown ..');
+      var i, y, x, e, c, u, block, empty, full, unknown, indices, index, section, possible, unknownList;
+      // iterate over all blocks
+      solved:
+        for (i = 0; i < 9; i += 1) {
+          empty = []; // Reset empty array
+          full = []; // Reset full array
+          block = this.getBlockAtIndex(i);
+
+//        if (i >= 0 && i <= 2) section = 0;
+//        if (i >= 3 && i <= 5) section = 3;
+//        if (i >= 6 && i <= 8) section = 6;
+
+          switch (i) {
+            case 0: section = {y:{start:0, stop:3}, x:{start:0, stop:3}}; break;
+            case 1: section = {y:{start:0, stop:3}, x:{start:3, stop:6}}; break;
+            case 2: section = {y:{start:0, stop:3}, x:{start:6, stop:9}}; break;
+            case 3: section = {y:{start:3, stop:6}, x:{start:0, stop:3}}; break;
+            case 4: section = {y:{start:3, stop:6}, x:{start:3, stop:6}}; break;
+            case 5: section = {y:{start:3, stop:6}, x:{start:6, stop:9}}; break;
+            case 6: section = {y:{start:6, stop:9}, x:{start:0, stop:3}}; break;
+            case 7: section = {y:{start:6, stop:9}, x:{start:3, stop:6}}; break;
+            case 8: section = {y:{start:6, stop:9}, x:{start:6, stop:9}}; break;
+          }
+
+          full = this.getBlockNumbers(section.y.start, block);
+          empty = this.filter(full);
+
+          if (empty.length === 5) {
+            console.log('BLOCK INDEX: ', i);
+            console.log('FULL: ', full);
+            console.log('EMPTY: ', empty);
+
+            unknownList = this.diff(this.ARRAY, full);
+
+            console.log("UNKNOWN LIST: ", unknownList);
+
+            for (u = 0; u < unknownList.length; u += 1) {
+              console.log('CHECK FOR NUMBER: ', unknownList[u]);
+              indices = [];
+
+              //console.log('BLOCK 2', block);
+              for (y = section.y.start; y < section.y.stop; y += 1) {
+                for (x = section.x.start; x < section.x.stop; x +=1 ) {
+                  console.log('BLOCK: (%i/%i) ', y, x);
+                  //console.log('BLOCK: (%i/%i) ', e, c, block[y][x]);
+                  if (this.grid[y][x] === null) indices.push({y:y,x:x});
+                }
+                //if (block[x][e] === null) indices.push(e);
+              }
+
+              console.log('INDICES: ', indices);
+
+              possible = [];
+              for (index = 0; index < indices.length; index += 1) {
+                if (!(this.doesVerticalSquareLineContain(indices[index].x, unknownList[u])) && !(this.doesHorizontalSquareLineContain(indices[index].y, unknownList[u]))) {
+                  possible.push({y: indices[index].y, x:indices[index].x, unknown:unknownList[u]});
+                }
+              }
+              if (possible.length === 1) {
+                console.log('SOLVED: number %i at position %i/%i', possible[0].unknown, possible[0].y, possible[0].x);
+                this.markAsSolved(possible[0].y, possible[0].x, possible[0].unknown);
+                break solved;
+              }
+            }
+          }
+        }
+    },
+
     solve: function() {
       if (this.abort) return false;
       console.log('solving ..\n');
       while (this.stuck === false) {
+        this.attempts += 1;
+        console.groupCollapsed('attempt: %i', this.attempts);
         this.stuck = true;
         this.solveHorizontalLinesWithOneUnknown();
         this.solveVerticalLinesWithOneUnknown();
@@ -399,6 +472,9 @@
         this.solveHorizontalLinesWithTwoUnknown();
         this.solveVerticalLinesWithTwoUnknown();
         this.solveHorizontalLinesWithThreeUnknown();
+        //this.solveVerticalLinesWithThreeUnknown();
+        this.solveBlocksWithFiveUnknown();
+        console.groupEnd();
       }
 
       this.validate(); // Validate when finished solving
