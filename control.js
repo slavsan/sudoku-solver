@@ -10,13 +10,40 @@
       btn.onclick = conf.cb;
       return btn;
     },
-    onClickBlock: function( cb ) {
-      var blocks = document.querySelectorAll('.block');
-      for (var i = 0; i < blocks.length; i += 1) {
-        blocks[i].onclick = function( e ) {
-          cb(e.target);
-        };
-      }
+    onClickBlock: function( callback ) {
+      document.addEventListener('click', function( e ) {
+        if (e.target.classList.contains('block')) {
+          var target = e.target;
+
+          target.innerHTML = '<input type="text" />';
+          var input = target.children[0];
+          input.focus();
+          var number;
+          target.onkeyup = function( e ) {
+            switch (e.keyCode) {
+              case 49:
+              case 50:
+              case 51:
+              case 52:
+              case 53:
+              case 54:
+              case 55:
+              case 56:
+              case 57:
+              case 58:
+                number = input.value;
+                break;
+              default:
+                console.log('ONLY INTEGERS FROM 1 TO 9 ARE ALLOWED: %i', e.keyCode);
+                input.value = '';
+                e.preventDefault();
+                return;
+            }
+
+            callback(target, number);
+          };
+        }
+      });
     }
   };
 

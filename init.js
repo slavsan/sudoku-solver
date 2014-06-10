@@ -26,37 +26,9 @@
     }
   });
 
-  control.onClickBlock(function( target ){
-    //console.log('BLAH');
-    console.log('CLICKED TARGET: %o', target);
-    target.innerHTML = '<input type="text" />';
-    var input = target.children[0];
-    input.focus();
-    var temp;
-    target.onkeyup = function( e ) {
-      switch (e.keyCode) {
-        case 49:
-        case 50:
-        case 51:
-        case 52:
-        case 53:
-        case 54:
-        case 55:
-        case 56:
-        case 57:
-        case 58:
-          temp = input.value;
-          break;
-        default:
-          console.log('ONLY INTEGERS FROM 1 TO 9 ARE ALLOWED: %i', e.keyCode);
-          input.value = '';
-          e.preventDefault();
-          return;
-      }
-
-      sudoku.setDefaultValue(target.getAttribute('y'), target.getAttribute('x'), temp);
-      sudoku.validate();
-    };
+  control.onClickBlock(function( target, number ){
+    sudoku.setDefaultValue(target.getAttribute('y'), target.getAttribute('x'), number);
+    sudoku.validate();
   });
 
 

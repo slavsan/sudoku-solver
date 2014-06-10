@@ -20,17 +20,17 @@
     init: function() {
       console.log('initialize here ..');
       this.grid = [];
-      for (var i = 0; i < this.y; i += 1) {
-        this.grid[i] = [];
-        for (var y = 0; y < this.x; y += 1) {
-          this.grid[i][y] = null;
+      for (var y = 0; y < this.y; y += 1) {
+        this.grid[y] = [];
+        for (var x = 0; x < this.x; x += 1) {
+          this.grid[y][x] = null;
         }
       }
     },
 
     setDefaultValue: function( y, x, number ) {
       var div = document.querySelector('#block-' + y + '-' + x);
-      this.grid[y][x] = number;
+      this.grid[y][x] = parseInt(number, 10);
       div.innerHTML = number;
       div.classList.add('default');
     },
@@ -428,10 +428,6 @@
             //console.log('FULL: ', full);
             //console.log('EMPTY: ', empty);
 
-            if (i === 6) {
-              console.log('BLOCK INDEX 6 HERE: ', full);
-            }
-
             unknownList = this.diff(this.ARRAY, full);
 
             //console.log("UNKNOWN LIST: ", unknownList);
@@ -450,26 +446,13 @@
                 //if (block[x][e] === null) indices.push(e);
               }
 
-              if (i === 6) {
-                console.log('BLOCK INDEX 6 HERE [INDICES]: ', indices);
-              }
-
               //console.log('INDICES: ', indices);
 
               possible = [];
               for (index = 0; index < indices.length; index += 1) {
-                if (i === 6) {
-                  console.log('DOES VERTICAL SQUARE LINE CONTAIN: ', this.doesVerticalSquareLineContain(indices[index].x, unknownList[u]));
-                  console.log('DOES HORIZONTAL SQUARE LINE CONTAIN: ', this.doesHorizontalSquareLineContain(indices[index].y, unknownList[u]));
-                }
                 if (this.doesVerticalSquareLineContain(indices[index].x, unknownList[u]) === false && this.doesHorizontalSquareLineContain(indices[index].y, unknownList[u]) === false) {
                   possible.push({y:indices[index].y, x:indices[index].x, unknown:unknownList[u]});
                 }
-              }
-
-              if (i === 6) {
-                console.log('BLOCK INDEX HERE [POSSIBLE]: %o', possible);
-                console.log("GRID: ", this.grid);
               }
 
               if (possible.length === 1) {
@@ -485,6 +468,7 @@
     solve: function() {
       if (this.abort) return false;
       console.log('solving ..\n');
+      this.attempts = 0;
       while (this.stuck === false) {
         this.attempts += 1;
         console.groupCollapsed('attempt: %i', this.attempts);
@@ -508,6 +492,8 @@
       }
 
       this.validate(); // Validate when finished solving
+
+      console.log('GRID: ', this.grid);
 
       if (this.stuck) console.log('\nstuck ..');
     }
